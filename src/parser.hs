@@ -31,9 +31,14 @@ parseNumber = liftM (Number . read) $ many digit
 
 parseString :: Parser LispVal
 parseString = do char '"'
-                 x <- many (noneOf "\"")
+                 x <- many (escapedChar <|> space <|> noneOf "\"")
                  char '"'
                  return $ String x
+
+escapedChar :: Parser Char
+escapedChar = do char '\\'
+                 x <- oneOf ['\\', '"']
+                 return x
 
 parseExp :: Parser LispVal
 parseExp = parseAtom
